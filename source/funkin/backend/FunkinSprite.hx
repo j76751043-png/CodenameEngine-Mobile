@@ -1,5 +1,7 @@
 package funkin.backend;
 
+import funkin.backend.system.interfaces.ISelectable;
+import funkin.backend.system.SelectableManager;
 import animate.FlxAnimate;
 import animate.FlxAnimateController.FlxAnimateAnimation;
 import flixel.addons.effects.FlxSkewedSprite;
@@ -48,7 +50,7 @@ enum abstract XMLAnimType(Int)
 	}
 }
 
-class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffsetCompatible implements IXMLEvents
+class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffsetCompatible implements IXMLEvents implements ISelectable
 {
 	public var extra:Map<String, Dynamic> = [];
 
@@ -61,6 +63,68 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 	public var animDatas:Map<String, AnimData> = [];
 	public var animEnabled:Bool = true;
 	public var zoomFactorEnabled:Bool = true;
+
+	// ===== Liru patch: cursor / selectable support (used by FunkinCursor) =====
+	public var angleFactor:Float = 1;
+	public var angleFactorEnabled:Bool = true;
+	public var unavailable:Bool = false;
+	public var enableCursor(default, set):Bool = false;
+
+	public var cursorOnHover:Void->Void;
+	public var cursorOnHoverExit:Void->Void;
+	public var cursorOnClick:Void->Void;
+
+	private function set_enableCursor(value:Bool):Bool
+	{
+		if (enableCursor == value)
+			return value;
+
+		enableCursor = value;
+		if (value)
+			SelectableManager.add(this);
+		else
+			SelectableManager.remove(this);
+		return value;
+	}
+
+	public function isSelectable():Bool
+	{
+		return enableCursor && exists && alive && visible && alpha > 0;
+	}
+
+	public function overlapsMouse(mousePosition:FlxPoint, camera:FlxCamera):Bool
+	{
+		return overlapsPoint(mousePosition, false, camera);
+	}
+
+	public function onHover():Void
+	{
+		if (cursorOnHover != null)
+			cursorOnHover();
+	}
+
+	public function onHoverExit():Void
+	{
+		if (cursorOnHoverExit != null)
+			cursorOnHoverExit();
+	}
+
+	public function onClick():Void
+	{
+		if (!unavailable && cursorOnClick != null)
+			cursorOnClick();
+	}
+
+	public function get_unavailable():Bool
+	{
+		return unavailable;
+	}
+
+	public function getObject():Dynamic
+	{
+		return this;
+	}
+	// ===== end Liru patch =====
 	public var angleFactorEnabled:Bool = true;
 
 	//Backwards compatibility
@@ -192,6 +256,11 @@ class FunkinSprite extends FlxAnimate implements IBeatReceiver implements IOffse
 	#if REGION
 	public override function destroy()
 	{
+		SelectableManager.remove(this);
+		cursorOnHover = null;
+		cursorOnHoverExit = null;
+		cursorOnClick = null;
+
 		if (animOffsets != null) {
 			for (key in animOffsets.keys()) {
 				final point = animOffsets[key];
