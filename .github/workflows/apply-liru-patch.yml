@@ -1,0 +1,30 @@
+name: Apply Liru Patch
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    name: Apply Liru Patch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Adds what the Liru mod needs: FunkinCursor, SelectableManager, ISelectable
+      # and cursor support inside FunkinSprite. Nothing else in the engine is touched.
+      - name: Apply patch
+        run: |
+          echo "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" | base64 -d | tar xz -C .
+          python3 liru_patch/patch_funkinsprite.py
+          rm -rf liru_patch
+
+      - name: Commit and push
+        run: |
+          git config user.name "liru-patch"
+          git config user.email "liru-patch@users.noreply.github.com"
+          git add -A
+          git commit -m "Add Liru mod support (FunkinCursor, SelectableManager, ISelectable)" || echo "Nothing to commit"
+          git push
