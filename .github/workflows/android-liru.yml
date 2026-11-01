@@ -1,0 +1,119 @@
+name: Android Build (Liru)
+on:
+  workflow_dispatch:
+  workflow_call:
+jobs:
+  build:
+    name: Android Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+
+      # Adds what the Liru mod needs: FunkinCursor, SelectableManager, ISelectable
+      # and cursor support inside FunkinSprite. Nothing else in the engine is touched.
+      - name: Apply Liru patch
+        run: |
+          echo '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' | base64 -d | tar xz -C .
+          python3 liru_patch/patch_funkinsprite.py
+
+      - name: Setting up Haxe
+        uses: krdlab/setup-haxe@v2
+        with:
+          haxe-version: 4.3.7
+
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@main
+        with:
+          ndk-version: r25c
+      - name: Restore Previous Cache
+        uses: actions/cache@v4
+        with:
+          # not caching the bin folder to prevent asset duplication and stuff like that
+          key: cache-build-android
+          path: |
+            ~/.gradle
+            .haxelib/
+            /home/runner/haxelib/
+            /Users/runner/haxelib/
+            C:/hostedtoolcache/windows/haxe/4.3.6/x64/lib/
+            ~/.haxelib/
+            export/release/android/haxe/
+            export/release/android/obj/
+            export/release/ios/${{ env.PROJECT_NAME }}/haxe/
+            export/release/ios/${{ env.PROJECT_NAME }}/obj/
+            export\release\windows\haxe\
+            export\release\windows\obj\
+            .haxelib\
+          restore-keys: |
+            cache-build-android
+      - name: Installing/Updating libraries
+        run: |
+          haxe -cp commandline -D analyzer-optimize --run Main setup -s
+
+      - name: Configure Android
+        run: |
+          haxelib run lime setup -alias -y
+          haxelib run lime config ANDROID_SDK $ANDROID_HOME
+          haxelib run lime config ANDROID_NDK_ROOT $ANDROID_NDK_HOME
+          haxelib run lime config JAVA_HOME $JAVA_HOME_17_X64
+          haxelib run lime config ANDROID_SETUP true
+      - name: Fix Haxelib
+        run: |
+          haxelib set lime git
+          haxelib set hxcpp git
+          haxelib set flixel git
+          haxelib set flixel-addons git
+          haxelib set flixel-animate git
+          haxelib set hxdiscord_rpc git
+      - name: Building the game
+        run: |
+          haxelib run lime build android -final -D ONLY_ARM64
+      - name: Uploading artifact (entire build)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Codename Engine Android Liru
+          path: export/release/android/bin/app/build/outputs/apk/release/*
+      - name: Clear Previous Cache
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const caches = await github.rest.actions.getActionsCacheList({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+            for (const cache of caches.data.actions_caches) {
+              if (cache.key == "cache-build-android") {
+                console.log('Clearing ' + cache.key + '...')
+                await github.rest.actions.deleteActionsCacheById({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  cache_id: cache.id,
+                })
+                console.log("Cache cleared.")
+              }
+            }
+      - name: Upload New Cache
+        uses: actions/cache@v4
+        with:
+          # caching again since for some reason it doesnt work with the first post cache shit
+          key: cache-build-android
+          path: |
+            ~/.gradle
+            .haxelib/
+            /home/runner/haxelib/
+            /Users/runner/haxelib/
+            C:/hostedtoolcache/windows/haxe/4.3.6/x64/lib/
+            ~/.haxelib/
+            export/release/android/haxe/
+            export/release/android/obj/
+            export/release/ios/${{ env.PROJECT_NAME }}/haxe/
+            export/release/ios/${{ env.PROJECT_NAME }}/obj/
+            export\release\windows\haxe\
+            export\release\windows\obj\
+            .haxelib\
+          restore-keys: |
+            cache-build-android
